@@ -28,7 +28,7 @@ export default function GalleryPage() {
     fetchMedia()
   }, [])
 
-  // Preview when a file is selected
+  // Generate a preview when a file is selected
   useEffect(() => {
     if (selectedFile) {
       const url = URL.createObjectURL(selectedFile)

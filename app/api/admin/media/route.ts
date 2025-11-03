@@ -24,11 +24,18 @@ export async function PATCH(request: Request) {
   try {
     const { id, approved } = await request.json()
 
-    const result = await sql`
-      UPDATE media SET approved = ${approved}, updated_at = NOW() WHERE id = ${id} AND wedding_id = ${1} RETURNING *
-    `
+    if (typeof id !== "number" || typeof approved !== "boolean") {
+      return Response.json({ error: "Invalid payload" }, { status: 400 })
+    }
 
-    return Response.json(result?.[0])
+    const result =
+      await sql`UPDATE media SET approved = ${approved} WHERE id = ${id} AND wedding_id = ${1} RETURNING *`
+
+    if (!result || result.length === 0) {
+      return Response.json({ error: "Media not found or not updated" }, { status: 404 })
+    }
+
+    return Response.json(result[0])
   } catch (error) {
     console.error("Error updating media:", error)
     return Response.json({ error: "Failed to update media" }, { status: 500 })

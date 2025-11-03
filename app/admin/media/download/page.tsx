@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Download, AlertCircle } from "lucide-react"
+import { Download, AlertCircle, Trash2 } from "lucide-react"
+import JSZip from "jszip"
+import { saveAs } from "file-saver"
 
 interface MediaItem {
   id: number
@@ -25,10 +27,15 @@ export default function DownloadMediaPage() {
   async function fetchApprovedMedia() {
     try {
       const res = await fetch("/api/media?approved=true")
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`)
+      }
       const data = await res.json()
-      setMedia(data)
+      const mediaArray = data.media || data || []
+      setMedia(Array.isArray(mediaArray) ? mediaArray : [])
     } catch (error) {
       console.error("Error fetching media:", error)
+      setMedia([])
     } finally {
       setLoading(false)
     }
@@ -59,6 +66,52 @@ export default function DownloadMediaPage() {
       link.click()
       document.body.removeChild(link)
     })
+  }
+
+  async function deleteSelected() {
+    if (selectedItems.length === 0) return
+    const confirm = window.confirm(`Delete ${selectedItems.length} selected item(s)? This cannot be undone.`)
+    if (!confirm) return
+
+    try {
+      // Delete each selected id
+      for (const id of selectedItems) {
+        const res = await fetch("/api/admin/media", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        })
+        if (!res.ok) {
+          console.error("Delete failed for id:", id, await res.text())
+        }
+      }
+      // Remove from UI and clear selection
+      setMedia((prev) => prev.filter((m) => !selectedItems.includes(m.id)))
+      setSelectedItems([])
+    } catch (err) {
+      console.error("Error deleting selected:", err)
+    }
+  }
+
+  async function deleteSingle(id: number) {
+    const confirm = window.confirm("Delete this item? This cannot be undone.")
+    if (!confirm) return
+
+    try {
+      const res = await fetch("/api/admin/media", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      })
+      if (!res.ok) {
+        console.error("Delete failed:", await res.text())
+        return
+      }
+      setMedia((prev) => prev.filter((m) => m.id !== id))
+      setSelectedItems((prev) => prev.filter((i) => i !== id))
+    } catch (err) {
+      console.error("Error deleting item:", err)
+    }
   }
 
   if (loading) return <div className="p-8">Loading...</div>
@@ -99,6 +152,21 @@ export default function DownloadMediaPage() {
                 <Download size={20} />
                 Download ({selectedItems.length})
               </button>
+              <button
+                onClick={downloadZipServer}
+                disabled={selectedItems.length === 0}
+                className="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition disabled:opacity-50"
+              >
+                Download ZIP (server)
+              </button>
+              <button
+                onClick={deleteSelected}
+                disabled={selectedItems.length === 0}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-2"
+              >
+                <Trash2 size={18} />
+                Delete Selected
+              </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -113,6 +181,18 @@ export default function DownloadMediaPage() {
                   }`}
                 >
                   <div className="h-48 bg-gray-200 relative">
+                    {/* Per-item delete button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        deleteSingle(item.id)
+                      }}
+                      className="absolute top-2 right-2 z-10 px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700 flex items-center gap-1"
+                      title="Delete this item"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+
                     {item.media_type === "image" ? (
                       <img
                         src={item.file_url || "/placeholder.svg"}
@@ -140,4 +220,47 @@ export default function DownloadMediaPage() {
       </div>
     </main>
   )
+
+  async function downloadZip() {
+    const itemsToDownload = media.filter((m) => selectedItems.includes(m.id))
+    if (itemsToDownload.length === 0) return
+
+    const zip = new JSZip()
+
+    await Promise.all(
+      itemsToDownload.map(async (item) => {
+        const resp = await fetch(item.file_url)
+        const blob = await resp.blob()
+        const defaultExt =
+          item.media_type === "video" ? "mp4" : "jpg"
+        const filename =
+          item.file_name ||
+          `${item.id}-${item.uploader_name || "media"}.${defaultExt}`
+        zip.file(filename, blob)
+      }),
+    )
+
+    const content = await zip.generateAsync({ type: "blob" })
+    const zipName = `wedding-media-${new Date().toISOString().slice(0, 10)}.zip`
+    saveAs(content, zipName)
+  }
+  async function downloadZipServer() {
+    const ids = selectedItems
+    if (ids.length === 0) return
+
+    const res = await fetch("/api/admin/media/zip", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    })
+
+    if (!res.ok) {
+      console.error("ZIP failed:", await res.text())
+      return
+    }
+
+    const blob = await res.blob()
+    const filename = `wedding-media-${new Date().toISOString().slice(0, 10)}.zip`
+    saveAs(blob, filename)
+  }
 }

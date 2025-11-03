@@ -48,12 +48,21 @@ export default function AdminDashboardPage() {
 
   async function approveMedia(mediaId: number) {
     try {
-      await fetch("/api/admin/media", {
+      const res = await fetch("/api/admin/media", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: mediaId, approved: true }),
       })
-      setPendingMedia(pendingMedia.filter((m) => m.id !== mediaId))
+
+      if (!res.ok) {
+        console.error("Approve failed:", await res.text())
+        return
+      }
+
+      const updated = await res.json()
+      if (updated?.approved === true) {
+        setPendingMedia((prev) => prev.filter((m) => m.id !== mediaId))
+      }
     } catch (err) {
       console.error("Error approving media:", err)
     }

@@ -1,13 +1,12 @@
 export async function downloadAllMedia() {
   try {
     const response = await fetch("/api/media?approved=true")
-    const media = await response.json()
-
-    // In a real app, you would use a library like JSZip to create a zip file
-    // For now, this function prepares the data
-    return media
+    const data = await response.json()
+    const mediaArray = data.media || data || []
+    return Array.isArray(mediaArray) ? mediaArray : []
   } catch (error) {
     console.error("Error downloading media:", error)
+    return []
   }
 }
 
