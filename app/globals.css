@@ -280,3 +280,14 @@ h3 { @apply text-2xl md:text-3xl; }
 .hero-veil {
   background: linear-gradient(to top, rgba(255,255,255,0.55), transparent 60%);
 }
+
+/* Utilities */
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none;    /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;            /* Chrome/Safari */
+  }
+}
