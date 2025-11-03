@@ -74,6 +74,7 @@
   --sidebar-ring: oklch(0.439 0 0);
 }
 
+/* Tailwind v4 theme tokens */
 @theme inline {
   --font-sans: "Geist", "Geist Fallback";
   --font-mono: "Geist Mono", "Geist Mono Fallback";
@@ -83,12 +84,22 @@
   --color-primary-light: #3b82f6;
   --color-accent: #d4af37;
   --color-accent-light: #f0d66d;
+
+  /* cream-focused palette for bridal party */
+  --color-cream: #f8f3e9;
+  --color-cream-100: #fdf9f2;
+  --color-cream-200: #f3e9d8;
+  --color-cream-300: #eadfca;
+  --color-cream-800: #7a6b59;
   --color-background: #fafaf9;
   --color-surface: #ffffff;
   --color-text-primary: #1f2937;
   --color-text-secondary: #6b7280;
   --color-border: #e5e7eb;
+}
 
+/* ✅ Move these into a selector */
+:root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -127,12 +138,51 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Remove legacy Tailwind v3 lines */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans, ui-sans-serif, system-ui);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/60 backdrop-blur-md border border-border rounded-xl shadow-sm;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full bg-cream px-3 py-1 text-sm text-primary;
+  }
+
+  .cream-divider {
+    @apply h-px w-full bg-border;
+  }
+
+  .bridal-banner {
+    @apply ring-2 ring-primary/20 rounded-2xl bg-accent shadow-sm;
+  }
+
+  .hero-veil {
+    position: relative;
+  }
+  .hero-veil::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(250, 247, 242, 0.35), rgba(250, 247, 242, 0.75));
+    pointer-events: none;
+    border-radius: inherit;
   }
 }
 
@@ -150,24 +200,83 @@ body {
   line-height: 1.6;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   @apply font-serif font-bold text-text-primary;
 }
 
-h1 {
-  @apply text-4xl md:text-5xl;
+h1 { @apply text-4xl md:text-5xl; }
+h2 { @apply text-3xl md:text-4xl; }
+h3 { @apply text-2xl md:text-3xl; }
+
+.section-heading {
+  font-family: var(--font-sans);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  text-align: left;
 }
 
-h2 {
-  @apply text-3xl md:text-4xl;
+.floral-bg {
+  background-image:
+    radial-gradient(1200px 600px at 10% 10%, rgba(212,175,55,0.12), transparent 70%),
+    radial-gradient(900px 500px at 90% 20%, rgba(59,130,246,0.12), transparent 70%),
+    radial-gradient(900px 500px at 30% 90%, rgba(212,175,55,0.12), transparent 70%);
+  background-repeat: no-repeat;
 }
 
-h3 {
-  @apply text-2xl md:text-3xl;
+.gold-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  border-radius: 999px;
+}
+
+.cream-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-cream-200), transparent);
+  border-radius: 999px;
+}
+
+.cream-card {
+  background: var(--color-cream-100);
+  border: 1px solid var(--color-cream-200);
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.chip-cream {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  background: var(--color-cream-100);
+  border: 1px solid var(--color-cream-200);
+  color: var(--color-cream-800);
+}
+
+.bridal-banner {
+  outline: 1px solid var(--color-cream-200);
+  box-shadow: 0 12px 30px rgba(122,107,89,0.15);
+  background: var(--color-cream-100);
+}
+
+.hero-veil {
+  background: linear-gradient(to top, rgba(255,255,255,0.55), transparent 60%);
 }

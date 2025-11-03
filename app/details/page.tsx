@@ -36,14 +36,23 @@ export default async function DetailsPage() {
         <h1 className="text-4xl font-serif text-primary text-center mb-2">
           {wedding?.couple_name_1} & {wedding?.couple_name_2}
         </h1>
-        <p className="text-center text-text-secondary mb-12">
+        <p className="text-center text-text-secondary mb-6">
           {wedding?.description || "Join us for our special celebration"}
         </p>
 
+        {/* Group Photo */}
+        <div className="rounded-2xl overflow-hidden border border-border shadow-lg mb-10 bridal-banner">
+          <img
+            src="/bridal-party.jpg"
+            alt="Bridal party group"
+            className="w-full h-[260px] md:h-[360px] object-cover"
+          />
+        </div>
+        <div className="cream-divider mb-8" />
         {/* Bridal Party */}
         {groupedPeople["bridesmaid"] && (
           <section className="mb-12">
-            <h2 className="text-3xl font-serif text-primary mb-6">Bridal Party</h2>
+            <h2 className="text-3xl font-serif text-primary mb-6">Bridesmaids</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {groupedPeople["bridesmaid"].map((person: any) => (
                 <div key={person.id} className="bg-surface rounded-lg p-6 border border-border">
