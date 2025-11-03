@@ -1,4 +1,3 @@
-// Top-level module
 import sql from "@/lib/db"
 import { del } from "@vercel/blob"
 
@@ -40,7 +39,6 @@ export async function DELETE(request: Request) {
   try {
     const { id } = await request.json()
 
-    // Retrieve blob URL to delete
     const record = await sql`SELECT blob_url FROM media WHERE id = ${id} AND wedding_id = ${1} LIMIT 1`
     const blobUrl = record?.[0]?.blob_url
 
@@ -49,7 +47,6 @@ export async function DELETE(request: Request) {
         await del(blobUrl, { token: process.env.BLOB_READ_WRITE_TOKEN })
       } catch (blobErr) {
         console.error("Blob delete failed:", blobErr)
-        // Continue to delete DB record even if blob fails
       }
     }
 

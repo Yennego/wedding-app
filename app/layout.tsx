@@ -1,12 +1,11 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { GeistSans } from "geist/font/sans"
+import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-const geistSans = Geist({ subsets: ["latin"] })
-const geistMono = Geist_Mono({ subsets: ["latin"] })
-
+// Use exported className directly
 export const metadata: Metadata = {
   title: "Wedding Celebration",
   description: "Join us to celebrate our special day",
@@ -20,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.className} bg-background text-foreground antialiased`}>
+      <body className={`${GeistSans.className} bg-background text-foreground antialiased`}>
         {children}
         <Analytics />
       </body>

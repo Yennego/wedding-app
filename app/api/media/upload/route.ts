@@ -1,4 +1,3 @@
-// Top-level module
 import { put } from "@vercel/blob"
 import sql from "@/lib/db"
 import { UPLOAD_LIMITS } from "@/lib/constants"
@@ -17,16 +16,12 @@ export async function POST(request: Request) {
       return Response.json({ error: "Uploader name required" }, { status: 400 })
     }
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      return Response.json(
-        { error: "Blob token missing. Set BLOB_READ_WRITE_TOKEN." },
-        { status: 500 },
-      )
+      return Response.json({ error: "Blob token missing. Set BLOB_READ_WRITE_TOKEN." }, { status: 500 })
     }
 
     const isVideo = file.type.startsWith("video")
     const mediaType = isVideo ? "video" : "image"
 
-    // Validate type & size
     if (
       (!isVideo && !UPLOAD_LIMITS.ALLOWED_IMAGE_TYPES.includes(file.type)) ||
       (isVideo && !UPLOAD_LIMITS.ALLOWED_VIDEO_TYPES.includes(file.type))
@@ -40,7 +35,6 @@ export async function POST(request: Request) {
       return Response.json({ error: "File too large" }, { status: 413 })
     }
 
-    // Upload to Vercel Blob with token
     const blob = await put(file.name, file, {
       access: "public",
       token: process.env.BLOB_READ_WRITE_TOKEN,

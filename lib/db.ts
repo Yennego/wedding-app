@@ -1,4 +1,3 @@
-// Top-level module
 import { neon } from "@neondatabase/serverless"
 
 const databaseUrl = process.env.NEON_DATABASE_URL

@@ -17,6 +17,7 @@ interface Media {
   caption: string
   approved: boolean
   media_type: string
+  file_url: string
 }
 
 export default function AdminDashboardPage() {
@@ -92,7 +93,17 @@ export default function AdminDashboardPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {pendingMedia.map((media) => (
                     <div key={media.id} className="bg-surface rounded-lg border border-border overflow-hidden">
-                      <div className="h-48 bg-gray-200"></div>
+                      <div className="h-48 bg-gray-200 relative">
+                        {media.media_type === "image" ? (
+                          <img
+                            src={media.file_url || "/placeholder.svg"}
+                            alt={media.caption}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <video src={media.file_url} controls className="w-full h-full object-cover" />
+                        )}
+                      </div>
                       <div className="p-4 space-y-3">
                         <div>
                           <p className="font-semibold text-primary">{media.uploader_name}</p>
@@ -100,7 +111,7 @@ export default function AdminDashboardPage() {
                         </div>
                         <button
                           onClick={() => approveMedia(media.id)}
-                          className="w-full bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-light transition"
+                          className="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light transition"
                         >
                           Approve
                         </button>

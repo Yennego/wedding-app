@@ -22,10 +22,21 @@ export default function GalleryPage() {
   const [uploaderName, setUploaderName] = useState("")
   const [caption, setCaption] = useState("")
   const [error, setError] = useState("")
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   useEffect(() => {
     fetchMedia()
   }, [])
+
+  // Preview when a file is selected
+  useEffect(() => {
+    if (selectedFile) {
+      const url = URL.createObjectURL(selectedFile)
+      setPreviewUrl(url)
+      return () => URL.revokeObjectURL(url)
+    }
+    setPreviewUrl(null)
+  }, [selectedFile])
 
   async function fetchMedia() {
     try {
@@ -112,6 +123,15 @@ export default function GalleryPage() {
               />
             </div>
 
+            {previewUrl && (
+              <div className="mt-4">
+                {selectedFile?.type.startsWith("video") ? (
+                  <video src={previewUrl} controls className="w-full max-h-64 rounded-lg border" />
+                ) : (
+                  <img src={previewUrl} alt="Preview" className="w-full max-h-64 object-cover rounded-lg border" />
+                )}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-semibold text-text-primary mb-2">Caption (Optional)</label>
               <textarea

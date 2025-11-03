@@ -1,16 +1,18 @@
-// Top-level script
-const { neon } = require("@neondatabase/serverless")
+require("dotenv").config({ path: ".env.local" })
 
-const databaseUrl = process.env.NEON_DATABASE_URL
+async function runMigration() {
+  try {
+    const { neon } = await import("@neondatabase/serverless")
+    const databaseUrl = process.env.NEON_DATABASE_URL
 
-if (!databaseUrl) {
-  console.error("[v0] Error: NEON_DATABASE_URL environment variable is not set")
-  process.exit(1)
-}
+    if (!databaseUrl) {
+      console.error("[v0] Error: NEON_DATABASE_URL environment variable is not set")
+      process.exit(1)
+    }
 
-const sql = neon(databaseUrl)
+    const sql = neon(databaseUrl)
 
-const schema = `
+    const schema = `
 CREATE TABLE IF NOT EXISTS weddings (
   id SERIAL PRIMARY KEY,
   couple_name_1 VARCHAR(150) NOT NULL,
@@ -90,16 +92,18 @@ CREATE INDEX IF NOT EXISTS idx_media_wedding_id ON media(wedding_id);
 CREATE INDEX IF NOT EXISTS idx_admin_users_wedding_id ON admin_users(wedding_id);
 `
 
-async function runMigration() {
-  try {
     console.log("[v0] Starting database migration...")
 
-    // Execute schema creation
-    await sql(schema)
+    // Execute each statement individually to avoid tagged-template limitation errors
+    for (const stmt of schema
+      .split(";")
+      .map((s) => s.trim())
+      .filter((s) => s.length)) {
+      await sql.query(stmt)
+    }
 
     console.log("[v0] ✓ Database tables created successfully!")
 
-    // Seed initial wedding data
     await sql`
       INSERT INTO weddings (couple_name_1, couple_name_2, wedding_date, location, address, description)
       VALUES ('John', 'Sabawu', '2024-12-19 13:30:00', 'Lakpazee Community Church', 'Airfield, Sinkor', 'Our wedding celebration')
