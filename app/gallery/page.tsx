@@ -23,9 +23,9 @@ export default function GalleryPage() {
   const [caption, setCaption] = useState("")
   const [error, setError] = useState("")
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [uploadSuccess, setUploadSuccess] = useState("")
 
   useEffect(() => {
-    fetchMedia()
   }, [])
 
   // Generate a preview when a file is selected
@@ -60,34 +60,33 @@ export default function GalleryPage() {
 
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault()
+    setError("")
+    setUploadSuccess("")
+
     if (!selectedFile || !uploaderName) {
-      setError("Please provide your name and select a file")
+      setError("Please provide your name and select a file.")
       return
     }
 
-    setUploading(true)
-    setError("")
-
     try {
+      setUploading(true)
       const formData = new FormData()
       formData.append("file", selectedFile)
       formData.append("uploaderName", uploaderName)
       formData.append("caption", caption)
 
-      const res = await fetch("/api/media/upload", {
-        method: "POST",
-        body: formData,
-      })
+      const res = await fetch("/api/media/upload", { method: "POST", body: formData })
+      if (!res.ok) throw new Error(await res.text())
 
-      if (!res.ok) throw new Error("Upload failed")
-
+      // Clear inputs and show success
       setSelectedFile(null)
       setUploaderName("")
       setCaption("")
-      await fetchMedia()
-    } catch (err) {
-      setError("Failed to upload. Please try again.")
-      console.error("[v0] Upload error:", err)
+      setPreviewUrl(null)
+      setUploadSuccess("Thanks! Your file was submitted and will be reviewed by admin.")
+    } catch (err: any) {
+      console.error("Upload error:", err)
+      setError("Upload failed. Please try again.")
     } finally {
       setUploading(false)
     }
@@ -98,10 +97,11 @@ export default function GalleryPage() {
       <div className="max-w-6xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-serif text-primary text-center mb-12">Wedding Gallery</h1>
 
-        {/* Upload Section */}
+        {/* Upload Section (kept) */}
         <div className="bg-surface rounded-lg p-8 border-2 border-dashed border-accent mb-12">
           <h2 className="text-2xl font-serif text-primary mb-6">Share Your Moments</h2>
           <form onSubmit={handleUpload} className="space-y-4">
+            {/* Your Name */}
             <div>
               <label className="block text-sm font-semibold text-text-primary mb-2">Your Name *</label>
               <input
@@ -113,6 +113,7 @@ export default function GalleryPage() {
               />
             </div>
 
+            {/* File */}
             <div>
               <label className="block text-sm font-semibold text-text-primary mb-2">Photo or Video *</label>
               <input
@@ -123,90 +124,44 @@ export default function GalleryPage() {
               />
             </div>
 
+            {/* Preview (optional) */}
             {previewUrl && (
               <div className="mt-4">
-                {selectedFile?.type.startsWith("video") ? (
-                  <video src={previewUrl} controls className="w-full max-h-64 rounded-lg border" />
+                {selectedFile?.type?.startsWith("video") ? (
+                  <video src={previewUrl} controls className="w-full rounded-md" />
                 ) : (
-                  <img src={previewUrl} alt="Preview" className="w-full max-h-64 object-cover rounded-lg border" />
+                  <img src={previewUrl} alt="Preview" className="w-full rounded-md" />
                 )}
               </div>
             )}
+
+            {/* Caption */}
             <div>
               <label className="block text-sm font-semibold text-text-primary mb-2">Caption (Optional)</label>
               <textarea
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-4 py-2 border border-border rounded-lg"
                 placeholder="Add a caption..."
-                rows={3}
               />
             </div>
-
-            {error && <p className="text-red-600 text-sm">{error}</p>}
 
             <button
               type="submit"
               disabled={uploading}
-              className="w-full bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-light transition disabled:opacity-50"
+              className="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light transition disabled:opacity-50"
             >
               {uploading ? "Uploading..." : "Upload"}
             </button>
+
+            {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+            {uploadSuccess && <p className="text-green-700 text-sm mt-2">{uploadSuccess}</p>}
           </form>
         </div>
 
-        {/* Gallery Grid */}
-        <div>
-          <h2 className="text-2xl font-serif text-primary mb-6">
-            {loading
-              ? "Loading..."
-              : media.length === 0
-                ? "No photos yet"
-                : `${media.length} Photo${media.length !== 1 ? "s" : ""}`}
-          </h2>
-
-          {error && !loading && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
-
-          {loading ? (
-            <div className="bg-surface rounded-lg p-12 text-center border border-border">
-              <p className="text-text-secondary">Loading gallery...</p>
-            </div>
-          ) : media.length === 0 ? (
-            <div className="bg-surface rounded-lg p-12 text-center border border-border">
-              <Upload size={40} className="mx-auto text-accent mb-4" />
-              <p className="text-text-secondary">Be the first to share your photos from the wedding!</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {media.map((item: Media) => (
-                <div key={item.id} className="bg-surface rounded-lg overflow-hidden border border-border">
-                  {item.media_type === "image" ? (
-                    <img
-                      src={item.file_url || "/placeholder.svg"}
-                      alt={item.caption}
-                      className="w-full h-64 object-cover"
-                    />
-                  ) : (
-                    <div className="relative w-full h-64 bg-black flex items-center justify-center">
-                      <Play size={40} className="text-white" />
-                      <video src={item.file_url} className="w-full h-full object-cover absolute" />
-                    </div>
-                  )}
-                  <div className="p-4">
-                    <p className="font-semibold text-primary">{item.uploader_name}</p>
-                    {item.caption && <p className="text-text-secondary text-sm mt-2">{item.caption}</p>}
-                    <p className="text-xs text-text-secondary mt-2">
-                      {new Date(item.uploaded_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+        {/* No listing: guests should not see uploads */}
+        <div className="bg-surface rounded-lg p-12 text-center border border-border">
+          <p className="text-text-secondary">Stay tuned—photos will appear here once approved.</p>
         </div>
       </div>
     </main>
