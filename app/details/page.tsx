@@ -1,4 +1,5 @@
 import sql from "@/lib/db"
+import BridalPartySlider from "@/components/bridal-party-slider"
 
 async function getWeddingDetails() {
   try {
@@ -40,14 +41,17 @@ export default async function DetailsPage() {
           {wedding?.description || "Join us for our special celebration"}
         </p>
 
-        {/* Group Photo */}
-        <div className="rounded-2xl overflow-hidden border border-border shadow-lg mb-10 bridal-banner">
-          <img
-            src="/bridal-party.jpg"
-            alt="Bridal party group"
-            className="w-full h-[260px] md:h-[360px] object-cover"
-          />
-        </div>
+        <BridalPartySlider
+          images={[
+            '/JoWu/DSC_9786.jpg',
+            'https://9j7ye4r1xonvafok.public.blob.vercel-storage.com/IMG_2873.jpeg',
+            '/JoWu/bride2.jpeg',
+            '/JoWu/bride3.jpeg',
+            '/JoWu/groom1.jpeg',
+            '/JoWu/groom2.jpeg',
+          ]}
+          heightClass="h-[260px] md:h-[360px]"
+        />
         <div className="cream-divider mb-8" />
         {/* Bridal Party */}
         {groupedPeople["bridesmaid"] && (

@@ -9,6 +9,8 @@ interface Event {
   event_name: string
   start_time: string
   location: string
+  lat?: number | null
+  lon?: number | null
 }
 
 interface Media {
@@ -65,6 +67,108 @@ export default function AdminDashboardPage() {
       }
     } catch (err) {
       console.error("Error approving media:", err)
+    }
+  }
+
+  async function saveEvent(ev: Event) {
+    try {
+      const res = await fetch("/api/admin/events", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: ev.id,
+          eventName: ev.event_name,
+          startTime: ev.start_time,
+          endTime: null,
+          location: ev.location,
+          description: null,
+          orderPosition: null,
+          lat: ev.lat ?? null,
+          lon: ev.lon ?? null,
+        }),
+      })
+      if (!res.ok) {
+        console.error("Failed to save event:", await res.text())
+        return
+      }
+      const updated = await res.json()
+      setEvents((prev) => prev.map((e) => (e.id === ev.id ? { ...e, ...updated } : e)))
+    } catch (err) {
+      console.error("Error saving event:", err)
+    }
+  }
+
+  function updateEventField(id: number, field: keyof Event, value: string) {
+    const clamp = (f: keyof Event, v: number | null) => {
+      if (v == null || !Number.isFinite(v)) return null
+      return f === "lat" ? Math.max(-90, Math.min(90, v)) : Math.max(-180, Math.min(180, v))
+    }
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.id === id
+          ? {
+              ...e,
+              [field]: field === "lat" || field === "lon" ? clamp(field, value === "" ? null : Number(value)) : value,
+            }
+          : e,
+      ),
+    )
+  }
+
+  // Add: client-only geocode using OpenStreetMap Nominatim
+  async function lookupCoords(ev: Event) {
+    const q = (ev.location || "").trim()
+    if (!q) return
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`
+      const res = await fetch(url, {
+        headers: {
+          "Accept": "application/json",
+          // Best practice for Nominatim etiquette; change to your email/domain if desired
+          "User-Agent": "wedding-app/1.0 (admin@wedding.local)"
+        }
+      })
+      if (!res.ok) {
+        console.error("Geocode failed:", await res.text())
+        return
+      }
+      const results = await res.json()
+      const r = Array.isArray(results) ? results[0] : null
+      if (r) {
+        updateEventField(ev.id, "lat", String(r.lat))
+        updateEventField(ev.id, "lon", String(r.lon))
+      }
+    } catch (err) {
+      console.error("Geocode error:", err)
+    }
+  }
+
+  // Add: create a basic event so fields appear
+  async function addEvent() {
+    try {
+      const nextOrder = (events.length || 0) + 1
+      const res = await fetch("/api/admin/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          eventName: "New Event",
+          startTime: new Date().toISOString(),
+          endTime: null,
+          location: "",
+          description: "",
+          orderPosition: nextOrder,
+          lat: null,
+          lon: null,
+        }),
+      })
+      if (!res.ok) {
+        console.error("Failed to add event:", await res.text())
+        return
+      }
+      const created = await res.json()
+      setEvents((prev) => [...prev, created])
+    } catch (err) {
+      console.error("Error adding event:", err)
     }
   }
 
@@ -133,21 +237,103 @@ export default function AdminDashboardPage() {
 
             <TabsContent value="events" className="space-y-6 mt-6">
               <div className="bg-surface rounded-lg border border-border p-6">
-                <h2 className="text-2xl font-serif text-primary mb-4">Upcoming Events</h2>
+                {/* Header with Add button */}
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-serif text-primary">Upcoming Events</h2>
+                  <button
+                    onClick={addEvent}
+                    className="px-3 py-2 border border-primary text-primary rounded-md hover:bg-primary/5 transition"
+                  >
+                    Add Event
+                  </button>
+                </div>
+
                 {events.length === 0 ? (
-                  <p className="text-text-secondary">No events added yet</p>
+                  <div className="space-y-3">
+                    <p className="text-text-secondary">No events added yet</p>
+                    <button
+                      onClick={addEvent}
+                      className="px-3 py-2 border border-primary text-primary rounded-md hover:bg-primary/5 transition"
+                    >
+                      Add First Event
+                    </button>
+                  </div>
                 ) : (
                   <div className="space-y-4">
                     {events.map((event) => (
-                      <div key={event.id} className="border-l-4 border-l-accent pl-4 py-2">
-                        <h3 className="font-semibold text-primary">{event.event_name}</h3>
-                        <p className="text-sm text-text-secondary">{new Date(event.start_time).toLocaleString()}</p>
-                        {event.location && <p className="text-sm text-text-secondary">📍 {event.location}</p>}
+                      <div key={event.id} className="border-l-4 border-l-accent pl-4 py-4 space-y-3">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-semibold">Event Name</label>
+                            <input
+                              value={event.event_name}
+                              onChange={(e) => updateEventField(event.id, "event_name", e.target.value)}
+                              className="w-full px-3 py-2 border rounded-md"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold">Location (optional)</label>
+                            <input
+                              value={event.location || ""}
+                              onChange={(e) => updateEventField(event.id, "location", e.target.value)}
+                              className="w-full px-3 py-2 border rounded-md"
+                              placeholder="Address or venue name"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => lookupCoords(event)}
+                              className="px-3 py-2 border border-primary text-primary rounded-md hover:bg-primary/5 transition"
+                              title="Use OpenStreetMap to get coordinates"
+                            >
+                              Lookup Coordinates
+                            </button>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold">Latitude</label>
+                            <input
+                              type="number"
+                              step="any"
+                              min={-90}
+                              max={90}
+                              value={event.lat ?? ""}
+                              onChange={(e) => updateEventField(event.id, "lat", e.target.value)}
+                              className="w-full px-3 py-2 border rounded-md"
+                              placeholder="e.g. 6.302"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold">Longitude</label>
+                            <input
+                              type="number"
+                              step="any"
+                              min={-180}
+                              max={180}
+                              value={event.lon ?? ""}
+                              onChange={(e) => updateEventField(event.id, "lon", e.target.value)}
+                              className="w-full px-3 py-2 border rounded-md"
+                              placeholder="-10.804"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => saveEvent(event)}
+                            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-light transition"
+                          >
+                            Save
+                          </button>
+                          {event.lat != null && event.lon != null && (
+                            <span className="text-xs text-text-secondary">
+                              Coordinates set: {event.lat}, {event.lon}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
+            </div>
             </TabsContent>
           </Tabs>
         )}
