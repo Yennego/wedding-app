@@ -225,6 +225,19 @@ h3 { @apply text-2xl md:text-3xl; }
   background-repeat: no-repeat;
 }
 
+.mask-image-gradient-b {
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0));
+          mask-image: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0));
+}
+.mask-image-gradient-t {
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0));
+          mask-image: linear-gradient(to top, rgba(0,0,0,1), rgba(0,0,0,0));
+}
+
+.font-script {
+  font-family: "Segoe Script", "Brush Script MT", cursive;
+}
+
 .gold-divider {
   height: 2px;
   background: linear-gradient(90deg, transparent, var(--color-accent), transparent);

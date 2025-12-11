@@ -77,7 +77,7 @@ export default async function Home() {
       <header className="border-b border-border sticky top-0 bg-surface/90 backdrop-blur-sm z-40">
         <nav className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="text-lg sm:text-2xl font-serif font-bold text-primary whitespace-nowrap">
-            Our Wedding: The Jowus
+            Our Wedding: Jowu-2025
           </div>
           {/* Desktop links */}
           <div className="hidden md:flex gap-6">
@@ -124,7 +124,7 @@ export default async function Home() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-cream">
-        <div className="absolute inset-0 floral-bg opacity-[0.25]" />
+        <div className="absolute inset-0 floral-bg opacity-[0.25] pointer-events-none" />
         <div className="w-full px-4 md:px-6 py-16 md:py-24 grid md:grid-cols-2 gap-8 items-center">
           <div className="order-2 md:order-1 text-center md:text-left space-y-6">
             <p className="text-accent text-sm font-serif tracking-widest uppercase">Together with their families</p>
@@ -197,24 +197,30 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <h2 className="section-heading">Bridal Party</h2>
-        <BridalPartySlider
-          images={[
-            "/JoWu/DSC_9786.jpg",
-            "https://9j7ye4r1xonvafok.public.blob.vercel-storage.com/IMG_2873.jpeg",
-            "/JoWu/bride2.jpeg",
-            "/JoWu/bride3.jpeg",
-            "/JoWu/groom1.jpeg",
-            "/JoWu/groom2.jpeg",
-          ]}
-          heightClass="h-[300px] md:h-[420px]"
-        />
-        <div className="cream-divider mt-10" />
+      <section className="relative overflow-hidden bg-cream">
+        <div className="absolute inset-0 floral-bg opacity-[0.12] pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 pt-12">
+          <h2 className="section-heading">Bridal Party</h2>
+        </div>
+        <div className="relative left-1/2 -translate-x-1/2 w-screen px-0 py-4">
+          <BridalPartySlider
+            images={[
+              "https://9j7ye4r1xonvafok.public.blob.vercel-storage.com/IMG_2873.jpeg",
+              "/JoWu/bride2.jpeg",
+              "/JoWu/bride3.jpeg",
+              "/JoWu/groom1.jpeg",
+              "/JoWu/groom2.jpeg",
+              "/JoWu/groom3.jpeg",
+            ]}
+            heightClass="h-[280px] sm:h-[320px] md:h-[420px] lg:h-[480px]"
+          />
+        </div>
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="cream-divider mt-10" />
+        </div>
       </section>
-
       {/* Gallery Teaser */}
-      <section className="max-w-7xl mx-auto px-4 pb-24">
+      <section className="max-w-7xl mx-auto px-4 pb-12">
         <h2 className="section-heading">Gallery Highlights</h2>
         {media.length === 0 ? (
           <div className="bg-surface rounded-xl p-8 border border-border text-center">
@@ -243,23 +249,64 @@ export default async function Home() {
           </Link>
         </div>
       </section>
-      {/* Map & Directions */}
-      <section className="max-w-md md:max-w-7xl mx-auto px-4 md:px-4 py-6">
-        <h2 className="text-lg md:text-2xl font-semibold text-primary mb-2">Map & Directions</h2>
-        {venue ? (
-          <LeafletMap
-            title={venue.event_name || "Venue"}
-            coords={{
-              lat: venue?.lat != null ? Number(venue.lat) : NaN,
-              lon: venue?.lon != null ? Number(venue.lon) : NaN,
-            }}
-            locationQuery={(venue?.location || "").trim()}
-          />
-        ) : (
-          <div className="text-sm text-text-secondary">
-            Venue details will be announced soon.
+      {/* Wedding Organizer */}
+      <section className="relative overflow-hidden bg-cream">
+        <div className="absolute inset-0 floral-bg opacity-[0.12] pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 pt-8 pb-12 grid md:grid-cols-2 gap-8 items-center">
+          <div className="order-2 md:order-1 text-center md:text-left space-y-4">
+            <h2 className="section-heading">Wedding Organizer</h2>
+            <p className="text-text-primary">
+              Special appreciation to our organizer for the planning and coordination that made this
+              celebration memorable. If you need a wedding organizer or event planner, feel free to reach out.
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+              <span className="chip">Event Planner</span>
+              <span className="chip">Coordination</span>
+              <span className="chip">Logistics</span>
+            </div>
+            <div>
+              <a href="tel:+231770329482" className="inline-block px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-light transition">
+                Book This Organizer
+              </a>
+            </div>
           </div>
-        )}
+          <div className="order-1 md:order-2">
+            <div className="relative rounded-2xl overflow-hidden shadow-xl ring-1 ring-border">
+              <div className="relative aspect-[3/2] sm:aspect-[4/3] md:aspect-[16/13]">
+                <Image
+                  src="/JoWu/planner/planner.jpeg"
+                  alt="Wedding organizer"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* Map & Directions */}
+      <section className="relative overflow-hidden bg-cream">
+        <div className="absolute inset-0 floral-bg opacity-[0.12] pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 pt-8">
+          <h2 className="section-heading">Map & Directions</h2>
+        </div>
+        <div className="relative left-1/2 -translate-x-1/2 w-screen px-0 py-8">
+          {venue ? (
+            <LeafletMap
+              title={venue.event_name || "Venue"}
+              coords={{
+                lat: venue?.lat != null ? Number(venue.lat) : NaN,
+                lon: venue?.lon != null ? Number(venue.lon) : NaN,
+              }}
+              locationQuery={(venue?.location || "").trim()}
+            />
+          ) : (
+            <div className="max-w-7xl mx-auto px-4 text-sm text-text-secondary">
+              Venue details will be announced soon.
+            </div>
+          )}
+        </div>
       </section>
     </main>
   )
