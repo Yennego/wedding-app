@@ -1,4 +1,5 @@
 import { CalendarDays, Clock, MapPin, Heart } from "lucide-react"
+import FadeInSection from "@/components/FadeInSection"
 import { Great_Vibes, Playfair_Display, Lora } from "next/font/google"
 
 const scriptFont = Great_Vibes({ subsets: ["latin"], weight: "400" })
@@ -114,44 +115,48 @@ export default async function ProgramPage() {
           </div>
         </header>
 
-        <section className="px-6 mb-10">
-          <div className="bg-surface rounded-2xl p-6 shadow-lg border relative overflow-hidden text-center">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
-            <h2 className="text-2xl font-serif font-bold text-text-primary mb-6">Officiating Clergy</h2>
-            <ul className="space-y-4 text-sm">
-              {clergy.map((c, i) => {
-                const parts = c.split("—")
+        <FadeInSection direction="up" distance={24} duration={700}>
+          <section className="px-6 mb-10">
+            <div className="bg-surface rounded-2xl p-6 shadow-lg border relative overflow-hidden text-center">
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
+              <h2 className="text-2xl font-serif font-bold text-text-primary mb-6">Officiating Clergy</h2>
+              <ul className="space-y-4 text-sm">
+                {clergy.map((c, i) => {
+                  const parts = c.split("—")
+                  return (
+                    <li key={i} className="flex flex-col items-center">
+                      <span className="font-semibold text-text-primary">{parts[0]}</span>
+                      <span className="text-primary italic text-xs">{parts[1]}</span>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          </section>
+        </FadeInSection>
+
+        <FadeInSection direction="up" distance={24} duration={700}>
+          <section className="px-4 mb-10">
+            <h2 className="text-3xl font-script text-center text-primary mb-6">Order of Program</h2>
+            <div className="relative space-y-4 max-w-5xl mx-auto">
+              <div className="absolute left-1/2 -translate-x-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-primary/10 via-primary/40 to-primary/10" />
+              {orderOfProgram.map((item, idx) => {
+                const parts = item.split("—")
                 return (
-                  <li key={i} className="flex flex-col items-center">
-                    <span className="font-semibold text-text-primary">{parts[0]}</span>
-                    <span className="text-primary italic text-xs">{parts[1]}</span>
-                  </li>
+                  <div key={idx} className="relative flex flex-col items-center text-center gap-2">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-bold shadow-sm z-10">
+                      {idx + 1}
+                    </div>
+                    <div className="bg-surface px-4 py-3 rounded-2xl shadow-sm border w-full md:w-3/4">
+                      <h4 className="font-serif font-bold text-text-primary md:text-base text-sm">{parts[0]}</h4>
+                      {parts[1] && <p className="text-xs text-text-secondary">{parts.slice(1).join("—")}</p>}
+                    </div>
+                  </div>
                 )
               })}
-            </ul>
-          </div>
-        </section>
-
-        <section className="px-4 mb-10">
-          <h2 className="text-3xl font-script text-center text-primary mb-6">Order of Program</h2>
-          <div className="relative space-y-4 max-w-5xl mx-auto">
-            <div className="absolute left-1/2 -translate-x-1/2 top-4 bottom-4 w-px bg-gradient-to-b from-primary/10 via-primary/40 to-primary/10" />
-            {orderOfProgram.map((item, idx) => {
-              const parts = item.split("—")
-              return (
-                <div key={idx} className="relative flex flex-col items-center text-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-bold shadow-sm z-10">
-                    {idx + 1}
-                  </div>
-                  <div className="bg-surface px-4 py-3 rounded-2xl shadow-sm border w-full md:w-3/4">
-                    <h4 className="font-serif font-bold text-text-primary md:text-base text-sm">{parts[0]}</h4>
-                    {parts[1] && <p className="text-xs text-text-secondary">{parts.slice(1).join("—")}</p>}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </section>
+            </div>
+          </section>
+        </FadeInSection>
 
         <div className="flex items-center justify-center gap-4 mb-10">
           <div className="h-px bg-border w-16" />
@@ -159,103 +164,109 @@ export default async function ProgramPage() {
           <div className="h-px bg-border w-16" />
         </div>
 
-        <section className="px-6 mb-10">
-          <h2 className="text-4xl font-script text-center text-primary mb-6">The Bridal Party</h2>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div className="flex flex-col">
-              <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Maid of Honor</span>
-              <span className="font-serif text-text-primary">{bridalParty.maidOfHonor}</span>
+        <FadeInSection direction="up" distance={24} duration={700}>
+          <section className="px-6 mb-10">
+            <h2 className="text-4xl font-script text-center text-primary mb-6">The Bridal Party</h2>
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div className="flex flex-col">
+                <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Maid of Honor</span>
+                <span className="font-serif text-text-primary">{bridalParty.maidOfHonor}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Bestman</span>
+                <span className="font-serif text-text-primary">{bridalParty.bestman}</span>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Bestman</span>
-              <span className="font-serif text-text-primary">{bridalParty.bestman}</span>
+            <div className="space-y-6 bg-surface p-6 rounded-2xl border mt-6 text-center">
+              <div className="flex flex-col items-center">
+                <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-2 border-b border-border pb-2 w-full">Bridesmaids</span>
+                {bridalParty.bridesmaids.map((b, i) => (
+                  <span key={i} className="font-serif text-text-primary">{b}</span>
+                ))}
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-2 border-b border-border pb-2 w-full">Groomsmen</span>
+                <span className="font-serif text-text-primary">Chris Lawor</span>
+                <span className="font-serif text-text-primary">Flomo Massaquoi</span>
+              </div>
             </div>
-          </div>
-          <div className="space-y-6 bg-surface p-6 rounded-2xl border mt-6 text-center">
-            <div className="flex flex-col items-center">
-              <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-2 border-b border-border pb-2 w-full">Bridesmaids</span>
-              {bridalParty.bridesmaids.map((b, i) => (
-                <span key={i} className="font-serif text-text-primary">{b}</span>
-              ))}
+            <div className="grid grid-cols-2 gap-y-6 gap-x-2 mt-6 text-center">
+              <div className="flex flex-col col-span-2 items-center">
+                <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Junior Bride</span>
+                <span className="font-serif text-text-primary">{bridalParty.juniorBride}</span>
+              </div>
+              <div className="flex flex-col col-span-2 items-center">
+                <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Bride Announcer</span>
+                <span className="font-serif text-text-primary">{bridalParty.brideAnnouncer}</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Flower Girl</span>
+                <span className="font-serif text-text-primary">{bridalParty.flowerGirl}</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Ring Bearer</span>
+                <span className="font-serif text-text-primary">{bridalParty.ringBearer}</span>
+              </div>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-2 border-b border-border pb-2 w-full">Groomsmen</span>
-              <span className="font-serif text-text-primary">Chris Lawor</span>
-              <span className="font-serif text-text-primary">Flomo Massaquoi</span>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-y-6 gap-x-2 mt-6 text-center">
-            <div className="flex flex-col col-span-2 items-center">
-              <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Junior Bride</span>
-              <span className="font-serif text-text-primary">{bridalParty.juniorBride}</span>
-            </div>
-            <div className="flex flex-col col-span-2 items-center">
-              <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Bride Announcer</span>
-              <span className="font-serif text-text-primary">{bridalParty.brideAnnouncer}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Flower Girl</span>
-              <span className="font-serif text-text-primary">{bridalParty.flowerGirl}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-primary font-bold uppercase text-[10px] tracking-[0.2em] mb-1">Ring Bearer</span>
-              <span className="font-serif text-text-primary">{bridalParty.ringBearer}</span>
-            </div>
-          </div>
-        </section>
+          </section>
+        </FadeInSection>
 
-        <section className="px-6 mb-10">
-          <div className="space-y-8 text-center">
-            <div>
-              <h3 className="text-3xl font-script text-primary mb-3">Groom's Parents</h3>
-              <div className="bg-surface p-4 rounded-xl border space-y-2">
-                <div className="flex justify-between items-end border-b border-dashed border-border pb-1">
-                  <span className="font-serif text-text-primary">Mr. Peter S. Lawor</span>
-                  <span className="text-xs text-primary font-bold uppercase tracking-widest">Father</span>
+        <FadeInSection direction="up" distance={24} duration={700}>
+          <section className="px-6 mb-10">
+            <div className="space-y-8 text-center">
+              <div>
+                <h3 className="text-3xl font-script text-primary mb-3">Groom's Parents</h3>
+                <div className="bg-surface p-4 rounded-xl border space-y-2">
+                  <div className="flex justify-between items-end border-b border-dashed border-border pb-1">
+                    <span className="font-serif text-text-primary">Mr. Peter S. Lawor</span>
+                    <span className="text-xs text-primary font-bold uppercase tracking-widest">Father</span>
+                  </div>
+                  <div className="flex justify-between items-end pt-1">
+                    <span className="font-serif text-text-primary">Ms Kemah L. Sackie</span>
+                    <span className="text-xs text-primary font-bold uppercase tracking-widest">Mother</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-end pt-1">
-                  <span className="font-serif text-text-primary">Ms Kemah L. Sackie</span>
-                  <span className="text-xs text-primary font-bold uppercase tracking-widest">Mother</span>
+              </div>
+              <div>
+                <h3 className="text-3xl font-script text-primary mb-3">Bride's Parents</h3>
+                <div className="bg-surface p-4 rounded-xl border space-y-2">
+                  <div className="flex justify-between items-end border-b border-dashed border-border pb-1">
+                    <span className="font-serif text-text-primary">Dea. Zubah K. Yennego, Sr.</span>
+                    <span className="text-xs text-primary font-bold uppercase tracking-widest">Father</span>
+                  </div>
+                  <div className="flex justify-between items-end pt-1">
+                    <span className="font-serif text-text-primary">Dea. Leah K. Yennego</span>
+                    <span className="text-xs text-primary font-bold uppercase tracking-widest">Mother</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div>
-              <h3 className="text-3xl font-script text-primary mb-3">Bride's Parents</h3>
-              <div className="bg-surface p-4 rounded-xl border space-y-2">
-                <div className="flex justify-between items-end border-b border-dashed border-border pb-1">
-                  <span className="font-serif text-text-primary">Dea. Zubah K. Yennego, Sr.</span>
-                  <span className="text-xs text-primary font-bold uppercase tracking-widest">Father</span>
-                </div>
-                <div className="flex justify-between items-end pt-1">
-                  <span className="font-serif text-text-primary">Dea. Leah K. Yennego</span>
-                  <span className="text-xs text-primary font-bold uppercase tracking-widest">Mother</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        </FadeInSection>
 
-        <section className="px-6 pb-12">
-          <h3 className="text-3xl font-script text-primary mb-4 text-center">Wedding Vendors</h3>
-          <div className="bg-surface rounded-2xl p-6 text-center text-sm space-y-3 border">
-            <p>
-              <span className="text-primary font-bold uppercase tracking-widest text-xs block mb-1">Decorator</span>
-              <span className="text-text-secondary">Divine Innovations & Events</span>
-            </p>
-            <p>
-              <span className="text-primary font-bold uppercase tracking-widest text-xs block mb-1">Caterer</span>
-              <span className="text-text-secondary">Nancy Catering Service</span>
-            </p>
-            <p>
-              <span className="text-primary font-bold uppercase tracking-widest text-xs block mb-1">Wedding Cake</span>
-              <span className="text-text-secondary">Reka Cakes</span>
-            </p>
-            <p>
-              <span className="text-primary font-bold uppercase tracking-widest text-xs block mb-1">Videos & Photos</span>
-              <span className="text-text-secondary">Chris & Grace</span>
-            </p>
-          </div>
-        </section>
+        <FadeInSection direction="up" distance={24} duration={700}>
+          <section className="px-6 pb-12">
+            <h3 className="text-3xl font-script text-primary mb-4 text-center">Wedding Vendors</h3>
+            <div className="bg-surface rounded-2xl p-6 text-center text-sm space-y-3 border">
+              <p>
+                <span className="text-primary font-bold uppercase tracking-widest text-xs block mb-1">Decorator</span>
+                <span className="text-text-secondary">Divine Innovations & Events</span>
+              </p>
+              <p>
+                <span className="text-primary font-bold uppercase tracking-widest text-xs block mb-1">Caterer</span>
+                <span className="text-text-secondary">Nancy Catering Service</span>
+              </p>
+              <p>
+                <span className="text-primary font-bold uppercase tracking-widest text-xs block mb-1">Wedding Cake</span>
+                <span className="text-text-secondary">Reka Cakes</span>
+              </p>
+              <p>
+                <span className="text-primary font-bold uppercase tracking-widest text-xs block mb-1">Videos & Photos</span>
+                <span className="text-text-secondary">Chris & Grace</span>
+              </p>
+            </div>
+          </section>
+        </FadeInSection>
 
         <footer className="bg-primary/10 py-8 text-center border-t border-border rounded-b-3xl">
           <h2 className="text-3xl font-serif font-bold text-text-primary mb-2">Reception</h2>
