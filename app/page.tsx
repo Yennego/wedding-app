@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 import BridalPartySlider from "@/components/bridal-party-slider";
 import FadeInSection from "@/components/FadeInSection";
 
+export const revalidate = 60;
 const Countdown = dynamic(() => import("../components/countdown"), { ssr: false });
 const LeafletMap = dynamic(() => import("@/components/leaflet-map"), { ssr: false });
 
