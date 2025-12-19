@@ -2,10 +2,23 @@ import sql from "@/lib/db"
 import Image from "next/image"
 import FadeInSection from "@/components/FadeInSection"
 
+type VowRow = {
+  id: number
+  person_name: string
+  vow_text: string
+}
+
+function asRows<T>(result: any): T[] {
+  if (!result) return []
+  if (Array.isArray(result)) return result as T[]
+  if (Array.isArray(result?.rows)) return result.rows as T[]
+  return []
+}
+
 async function getVows() {
   try {
-    const result = await sql`SELECT * FROM vows WHERE wedding_id = 1 ORDER BY created_at DESC`
-    return result || []
+    const result = await sql`SELECT id, person_name, vow_text FROM vows WHERE wedding_id = ${1} ORDER BY created_at DESC`
+    return asRows<VowRow>(result)
   } catch (error) {
     console.error("[v0] Error fetching vows:", error)
     return []
@@ -26,7 +39,7 @@ export default async function VowsPage() {
             <div className="bg-surface rounded-2xl p-8 border border-border shadow-sm">
               <div className="flex items-center gap-4 mb-4">
                 <div className="relative w-16 h-16">
-                  <Image src="/JoWu/groom1.jpeg" alt="Groom" fill className="rounded-full object-cover ring-2 ring-primary/20" sizes="64px" />
+                  <Image src="/JoWu/Groom_Bride.jpg" alt="Groom" fill className="rounded-full object-cover ring-2 ring-primary/20" sizes="64px" />
                 </div>
                 <div>
                   <p className="text-accent font-serif text-sm uppercase tracking-wider">John • Groom</p>
@@ -46,7 +59,7 @@ export default async function VowsPage() {
             <div className="bg-surface rounded-2xl p-8 border border-border shadow-sm">
               <div className="flex items-center gap-4 mb-4">
                 <div className="relative w-16 h-16">
-                  <Image src="/JoWu/bride2.jpeg" alt="Bride" fill className="rounded-full object-cover ring-2 ring-accent/30" sizes="64px" />
+                  <Image src="/JoWu/Groom_Bride.jpg" alt="Bride" fill className="rounded-full object-cover ring-2 ring-accent/30" sizes="64px" />
                 </div>
                 <div>
                   <p className="text-accent font-serif text-sm uppercase tracking-wider">Sabawu • Bride</p>
@@ -67,7 +80,7 @@ export default async function VowsPage() {
 
         {vows.length === 0 ? (
           <div className="bg-surface rounded-lg p-12 text-center border border-border">
-            <p className="text-text-secondary">Vows will be shared soon. Check back later.</p>
+            <p className="text-text-secondary">💖💖💖💖💖💖</p>
           </div>
         ) : (
           <div className="space-y-8">
